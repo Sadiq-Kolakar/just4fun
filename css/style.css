@@ -1,0 +1,883 @@
+/* =========================================================================
+   Spider-Man Fan Zone — style.css
+   Color palette:
+     Red:        #E23636
+     Blue:       #2C5EA8
+     Dark BG:    #0a0a0a / #1a1a2e
+     Accent:     #F5F5F5
+   Fonts: Bangers (headings), Roboto (body)
+   ========================================================================= */
+
+/* ----- Reset & base ---------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --red:      #E23636;
+  --blue:     #2C5EA8;
+  --dark1:    #0a0a0a;
+  --dark2:    #1a1a2e;
+  --accent:   #F5F5F5;
+  --nav-h:    64px;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background: var(--dark1);
+  color: var(--accent);
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ----- Canvas overlay (cursor trail) ----------------------------------- */
+#webCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* clicks pass through */
+  z-index: 9999;
+}
+
+/* ----- Scrollbar -------------------------------------------------------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark1); }
+::-webkit-scrollbar-thumb { background: var(--red); border-radius: 3px; }
+
+/* =========================================================================
+   NAVIGATION
+   ========================================================================= */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(226,54,54,0.2);
+  z-index: 1000;
+  transition: background 0.3s;
+}
+
+.navbar.scrolled {
+  background: rgba(10,10,10,0.97);
+  border-bottom-color: var(--red);
+}
+
+/* Brand */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  color: var(--red);
+  text-decoration: none;
+}
+
+.spider-logo {
+  width: 32px;
+  height: 32px;
+  /* subtle spin on hover */
+  transition: transform 0.4s ease;
+}
+.nav-brand:hover .spider-logo {
+  transform: rotate(90deg);
+}
+
+/* Nav links */
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-family: 'Bangers', cursive;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  position: relative;
+  transition: color 0.25s;
+}
+
+/* Animated underline */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--red);
+  transition: width 0.3s ease;
+}
+.nav-link:hover { color: var(--red); }
+.nav-link:hover::after { width: 100%; }
+
+/* Hamburger button */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+}
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+/* Animate hamburger → X */
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* =========================================================================
+   HERO SECTION
+   ========================================================================= */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 60% 40%, #1a1a2e 0%, #0a0a0a 70%);
+  padding-top: var(--nav-h);
+}
+
+/* Optional video background */
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+  z-index: 0;
+}
+
+/* Spider-web SVG overlay */
+.hero-web-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.web-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Parallax background blobs */
+.parallax-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  will-change: transform;
+}
+.blob-1 {
+  width: 500px;
+  height: 500px;
+  background: var(--red);
+  top: -100px;
+  right: -100px;
+}
+.blob-2 {
+  width: 400px;
+  height: 400px;
+  background: var(--blue);
+  bottom: -80px;
+  left: -80px;
+}
+
+/* Hero content */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  padding: 0 1.5rem;
+}
+
+/* =========================================================================
+   GLITCH EFFECT (Spider-Verse chromatic-aberration style)
+   How it works:
+     - The element has a `data-text` attribute matching its text content.
+     - Two pseudo-elements (::before / ::after) are stacked on top,
+       clipped to different vertical slices and animated to shift
+       horizontally with red/blue color channels — the classic RGB split.
+   ========================================================================= */
+.glitch-title {
+  font-family: 'Bangers', cursive;
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  color: var(--accent);
+  position: relative;
+  display: inline-block;
+  /* Chrome performance hint */
+  will-change: transform;
+}
+
+/* Both pseudo-elements share the text via `content: attr(data-text)` */
+.glitch-title::before,
+.glitch-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Red channel — shifts left */
+.glitch-title::before {
+  color: var(--red);
+  animation: glitch-r 3s infinite linear alternate-reverse;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+
+/* Blue channel — shifts right */
+.glitch-title::after {
+  color: var(--blue);
+  animation: glitch-b 3s infinite linear alternate;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+}
+
+@keyframes glitch-r {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-4px); }
+  40%  { transform: translateX(4px); }
+  60%  { transform: translateX(-2px); }
+  80%  { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes glitch-b {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(4px); }
+  40%  { transform: translateX(-4px); }
+  60%  { transform: translateX(2px); }
+  80%  { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Smaller glitch variant used in section headings */
+.glitch-title-sm {
+  font-family: 'Bangers', cursive;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  position: relative;
+  display: inline-block;
+}
+.glitch-title-sm::before,
+.glitch-title-sm::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.glitch-title-sm::before {
+  color: var(--red);
+  animation: glitch-r 4s infinite linear alternate-reverse;
+  clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+}
+.glitch-title-sm::after {
+  color: var(--blue);
+  animation: glitch-b 4s infinite linear alternate;
+  clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+}
+
+/* =========================================================================
+   TYPEWRITER SUBTITLE
+   The text is injected character-by-character by JS (app.js).
+   The blinking cursor is a CSS animation.
+   ========================================================================= */
+.hero-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: rgba(245,245,245,0.8);
+  margin: 1.2rem 0 2rem;
+  min-height: 2em;
+  letter-spacing: 0.02em;
+}
+
+/* Blinking cursor */
+.cursor-blink {
+  display: inline-block;
+  color: var(--red);
+  animation: blink 0.8s step-start infinite;
+  margin-left: 2px;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* CTA buttons */
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-primary,
+.btn-secondary {
+  font-family: 'Bangers', cursive;
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  padding: 0.65rem 1.8rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(226,54,54,0.4);
+}
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(226,54,54,0.6);
+}
+
+.btn-secondary {
+  border: 2px solid var(--blue);
+  color: var(--blue);
+  background: transparent;
+}
+.btn-secondary:hover {
+  background: var(--blue);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(44,94,168,0.5);
+}
+
+/* Scroll hint arrow */
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.scroll-arrow {
+  width: 24px;
+  height: 24px;
+  border-right: 3px solid var(--red);
+  border-bottom: 3px solid var(--red);
+  transform: rotate(45deg);
+  animation: bounce-arrow 1.5s ease-in-out infinite;
+}
+@keyframes bounce-arrow {
+  0%, 100% { transform: rotate(45deg) translateY(0); opacity: 1; }
+  50%       { transform: rotate(45deg) translateY(6px); opacity: 0.5; }
+}
+
+/* =========================================================================
+   SHARED SECTION STYLES
+   ========================================================================= */
+.section {
+  padding: 5rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: rgba(245,245,245,0.6);
+  margin-bottom: 3rem;
+  font-size: 1rem;
+}
+
+/* =========================================================================
+   SCROLL-REVEAL ANIMATION
+   Elements with .reveal-item are initially hidden (translateY + opacity).
+   The IntersectionObserver in app.js adds .revealed when they enter view.
+   ========================================================================= */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+
+.reveal-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delay for children of the same container */
+.reveal-item:nth-child(2) { transition-delay: 0.1s; }
+.reveal-item:nth-child(3) { transition-delay: 0.2s; }
+.reveal-item:nth-child(4) { transition-delay: 0.3s; }
+.reveal-item:nth-child(5) { transition-delay: 0.4s; }
+.reveal-item:nth-child(6) { transition-delay: 0.5s; }
+
+/* =========================================================================
+   GALLERY SECTION
+   ========================================================================= */
+.gallery-section {
+  background: linear-gradient(180deg, transparent 0%, rgba(26,26,46,0.5) 100%);
+  max-width: 100%;
+  padding: 5rem 2rem;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Gallery card */
+.gallery-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s;
+  will-change: transform;
+}
+
+.gallery-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(226,54,54,0.25);
+  border-color: var(--red);
+}
+
+/* Card image wrapper — controls zoom & web-frame */
+.card-img-wrap {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+/* Placeholder fills the image slot with a gradient + icon */
+.card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s ease;
+}
+.gallery-card:hover .card-placeholder {
+  transform: scale(1.08);
+}
+
+.card-placeholder-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 16px rgba(255,255,255,0.4));
+}
+
+/* =========================================================================
+   WEB-FRAME BORDER ANIMATION
+   On hover a SVG-drawn "spider-web" border animates in around the card image
+   using stroke-dashoffset technique.
+   ========================================================================= */
+.web-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* White border that animates via clip-path on hover */
+}
+.web-frame::before,
+.web-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 3px solid transparent;
+  border-radius: 4px;
+  transition: border-color 0.4s ease;
+}
+.gallery-card:hover .web-frame::before {
+  border-top-color: var(--red);
+  border-right-color: var(--red);
+  animation: web-border-1 0.4s linear forwards;
+}
+.gallery-card:hover .web-frame::after {
+  border-bottom-color: var(--blue);
+  border-left-color: var(--blue);
+  animation: web-border-2 0.4s linear 0.2s forwards;
+}
+@keyframes web-border-1 {
+  from { clip-path: inset(0 100% 100% 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes web-border-2 {
+  from { clip-path: inset(100% 0 0 100%); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+/* Card body */
+.card-body {
+  padding: 1rem;
+}
+.card-body h3 {
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  color: var(--red);
+  margin-bottom: 0.4rem;
+}
+.card-body p {
+  font-size: 0.88rem;
+  color: rgba(245,245,245,0.65);
+}
+
+/* =========================================================================
+   FUN SECTION
+   ========================================================================= */
+.fun-section {
+  background: linear-gradient(180deg, rgba(26,26,46,0.5) 0%, transparent 100%);
+  max-width: 100%;
+  padding: 5rem 2rem;
+}
+
+.fun-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.fun-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.fun-card:hover {
+  border-color: var(--blue);
+  transform: translateY(-4px);
+}
+
+.fun-card-icon {
+  font-size: 3rem;
+  margin-bottom: 0.8rem;
+}
+
+.fun-card h3 {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.fun-card p {
+  font-size: 0.9rem;
+  color: rgba(245,245,245,0.6);
+  margin-bottom: 1.2rem;
+}
+
+/* THWIP! button */
+.btn-thwip {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  letter-spacing: 0.1em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--red), var(--blue));
+  border: none;
+  padding: 0.6rem 2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 20px rgba(226,54,54,0.35);
+}
+.btn-thwip:hover {
+  transform: scale(1.07);
+  box-shadow: 0 8px 30px rgba(226,54,54,0.5);
+}
+.btn-thwip:active {
+  transform: scale(0.95);
+}
+/* Ripple on click (added by JS) */
+.btn-thwip .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  transform: scale(0);
+  animation: ripple-out 0.6s linear;
+  pointer-events: none;
+}
+@keyframes ripple-out {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* Demo click area */
+.demo-area {
+  height: 80px;
+  border: 2px dashed rgba(44,94,168,0.4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(245,245,245,0.4);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+}
+.demo-area:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* Trail preview (CSS-only animated dots) */
+.trail-preview {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  height: 80px;
+  align-items: center;
+}
+.trail-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--red), var(--blue));
+  animation: trail-pulse 1.4s ease-in-out infinite;
+  animation-delay: calc(var(--d) * 0.15s);
+  opacity: 0.8;
+}
+@keyframes trail-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50%       { transform: scale(1.6); opacity: 0.3; }
+}
+
+/* =========================================================================
+   THWIP OVERLAY (full-screen web lines fired by JS)
+   ========================================================================= */
+#thwipOverlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8000;
+  overflow: hidden;
+}
+/* Individual web strands injected by JS */
+.thwip-strand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 2px;
+  transform-origin: left center;
+  border-radius: 1px;
+  animation: thwip-extend 0.6s ease-out forwards;
+}
+@keyframes thwip-extend {
+  0%   { width: 0; opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* =========================================================================
+   CLICK BURST ANIMATION
+   Small spider-web burst rendered as positioned divs injected by JS.
+   Each burst has several .burst-line children that radiate outward.
+   ========================================================================= */
+#burstContainer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8500;
+}
+.burst {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.burst-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 20px;
+  border-radius: 1px;
+  transform-origin: bottom center;
+  animation: burst-shoot 0.5s ease-out forwards;
+}
+@keyframes burst-shoot {
+  0%   { transform: rotate(var(--angle)) scaleY(0); opacity: 1; }
+  60%  { transform: rotate(var(--angle)) scaleY(1) translateY(-14px); opacity: 0.9; }
+  100% { transform: rotate(var(--angle)) scaleY(0.6) translateY(-22px); opacity: 0; }
+}
+
+/* =========================================================================
+   ABOUT SECTION
+   ========================================================================= */
+.about-section {
+  max-width: 800px;
+}
+.about-inner {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(226,54,54,0.15);
+  border-radius: 12px;
+  padding: 3rem 2.5rem;
+}
+.about-inner p {
+  color: rgba(245,245,245,0.75);
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+.about-inner code {
+  background: rgba(226,54,54,0.15);
+  color: var(--red);
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+.tech-list {
+  list-style: none;
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.tech-list li {
+  color: rgba(245,245,245,0.7);
+  font-size: 0.95rem;
+  padding-left: 0.5rem;
+  border-left: 3px solid var(--red);
+}
+
+/* =========================================================================
+   FOOTER
+   ========================================================================= */
+.site-footer {
+  border-top: 1px solid rgba(226,54,54,0.15);
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+  position: relative;
+}
+.footer-web {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  overflow: hidden;
+}
+.footer-web svg {
+  width: 100%;
+  height: 100%;
+}
+.site-footer p {
+  color: rgba(245,245,245,0.55);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+.footer-sub {
+  font-size: 0.75rem !important;
+  color: rgba(245,245,245,0.3) !important;
+}
+
+/* =========================================================================
+   RESPONSIVE — TABLET
+   ========================================================================= */
+@media (max-width: 768px) {
+  /* Show hamburger, hide full nav list */
+  .hamburger { display: flex; }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    position: absolute;
+    top: var(--nav-h);
+    left: 0;
+    width: 100%;
+    background: rgba(10,10,10,0.97);
+    border-bottom: 1px solid rgba(226,54,54,0.2);
+    padding: 1rem 0;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links li { padding: 0.6rem 2rem; }
+  .nav-link::after { display: none; }
+
+  .glitch-title { font-size: clamp(1.8rem, 8vw, 3rem); }
+
+  .gallery-grid,
+  .fun-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* =========================================================================
+   RESPONSIVE — MOBILE
+   ========================================================================= */
+@media (max-width: 480px) {
+  .gallery-grid,
+  .fun-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .about-inner {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* =========================================================================
+   UTILITY — reduced-motion override
+   Respects the user's OS-level preference.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
